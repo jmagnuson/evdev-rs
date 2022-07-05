@@ -880,6 +880,7 @@ impl Device {
                     */
 
                     println!("Shouldn't be possible?");
+                    guard.clear_ready();
                     continue;
                 }
             }
