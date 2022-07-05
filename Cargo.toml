@@ -27,7 +27,14 @@ evdev-sys = { path = "evdev-sys", version = "0.2.2" }
 libc = "0.2.67"
 bitflags = "1.2.1"
 log = "0.4.8"
-tokio_ = { package = "tokio", version = "1", features = ["fs", "io-util", "sync", "time"], optional = true }
+tokio_ = { package = "tokio", version = "1", features = ["fs", "io-util", "net", "sync", "time"], optional = true }
+
+[dev-dependencies]
+tokio_ = { package = "tokio", version = "1", features = ["macros", "rt-multi-thread"] }
 
 [package.metadata.docs.rs]
 features = ["serde", "libevdev-1-10"]
+
+[[example]]
+name = "evtest_tokio"
+required-features = ["tokio"]

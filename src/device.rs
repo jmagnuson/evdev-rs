@@ -1,10 +1,11 @@
 use crate::{AbsInfo, GrabMode, InputEvent, LedState, ReadFlag, ReadStatus, TimeVal};
 use libc::{c_int, c_uint, c_void};
 use std::ffi::CString;
-use std::fs::File;
+use tokio_::fs::File;
 use std::mem::ManuallyDrop;
 use std::os::unix::io::{AsRawFd, FromRawFd};
 use std::{io, ptr};
+use tokio_ as tokio;
 
 use crate::enums::*;
 use crate::util::*;
@@ -856,6 +857,37 @@ impl Device {
             raw::LIBEVDEV_READ_STATUS_SYNC => Ok((ReadStatus::Sync, event)),
             error => Err(io::Error::from_raw_os_error(-error)),
         }
+    }
+
+    pub async fn next_event_async(&self, flags: ReadFlag) -> io::Result<(ReadStatus, InputEvent)> {
+        loop {
+            let fd = {
+                let fd = unsafe {
+                    raw::libevdev_get_fd(self.raw)
+                };
+                tokio::io::unix::AsyncFd::new(fd)?
+            };
+            let mut guard = fd.readable().await?;
+            let result = self.next_event(flags);
+
+            if let Err(ref e) = result {
+                if let io::ErrorKind::WouldBlock = e.kind() {
+                    /*
+                    let fd = unsafe {
+                        raw::libevdev_get_fd(self.raw)
+                    };
+                    let fd = tokio::io::unix::AsyncFd::new(fd)?;
+                    */
+
+                    println!("Shouldn't be possible?");
+                    continue;
+                }
+            }
+
+            //guard.clear_ready();
+            return result;
+        }
+
     }
 }
 
