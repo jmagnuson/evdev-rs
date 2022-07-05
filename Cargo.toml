@@ -19,6 +19,7 @@ a library interface to the callers, thus avoiding erroneous ioctls, etc.
 default = []
 # Use features from libevdev version 1.10 and greater (libevdev_property_disable)
 libevdev-1-10 = ["evdev-sys/libevdev-1-10"]
+tokio = ["tokio_"]
 
 [dependencies]
 serde = { version = "1.0", default-features = false, features=["derive"], optional = true }
@@ -26,6 +27,7 @@ evdev-sys = { path = "evdev-sys", version = "0.2.2" }
 libc = "0.2.67"
 bitflags = "1.2.1"
 log = "0.4.8"
+tokio_ = { package = "tokio", version = "1", features = ["fs", "io-util", "sync", "time"], optional = true }
 
 [package.metadata.docs.rs]
 features = ["serde", "libevdev-1-10"]
